@@ -7,6 +7,7 @@ driver, action = initilize_driver()
 
 app = Flask(__name__)
 
+
 # Route to trigger the scraping and return JSON
 @app.route('/scrape', methods=['GET'])
 def scrape_and_return_json():
