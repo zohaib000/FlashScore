@@ -1,13 +1,16 @@
 from flask import Flask, jsonify
 from scraper import Scrape,initilize_driver  # Import the Scrape function
+global driver
+global action
 
-driver,action=initilize_driver()
+driver, action = initilize_driver()
 
 app = Flask(__name__)
 
 # Route to trigger the scraping and return JSON
 @app.route('/scrape', methods=['GET'])
 def scrape_and_return_json():
+    global driver, action
     data,driver,action = Scrape(driver,action)  
     return jsonify(data)  
 
