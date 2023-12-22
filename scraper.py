@@ -26,6 +26,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.remote.webelement import WebElement
 import openpyxl
 import pandas as pd
+from selenium.common.exceptions import StaleElementReferenceException, NoSuchWindowException
 
 
 def initilize_driver():
@@ -66,12 +67,15 @@ def validate(ele):
     
 
 def Scrape(driver,action):
-    
-    # ? clicking on expand buttons if exist
-    expand_buttons=driver.find_elements(By.XPATH,'//div[@class="event__info"]/following-sibling::*') 
-    for button in expand_buttons:
-            button.click()
-            
+    try:
+        # ? clicking on expand buttons if exist
+        expand_buttons=driver.find_elements(By.XPATH,'//div[@class="event__info"]/following-sibling::*') 
+        for button in expand_buttons:
+                button.click()
+                
+    except NoSuchWindowException:
+        driver,action=initilize_driver()
+                
     # ? waiting for live matches to load 
     WebDriverWait(driver,20).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR,"section.event")))
     soup=BeautifulSoup(driver.page_source,"html.parser")
@@ -149,7 +153,7 @@ def Scrape(driver,action):
             }
     
         live_leagues.append(match)
-    return live_leagues
+    return live_leagues,driver,action
         
         
 # while True:
