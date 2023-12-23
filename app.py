@@ -12,7 +12,9 @@ app = Flask(__name__)
 @app.route('/scrape', methods=['GET'])
 def scrape_and_return_json():
     global driver, action
-    data,driver,action = Scrape(driver,action)  
+    data,returned_driver,returned_action = Scrape(driver,action)  
+    driver=returned_driver
+    action=returned_action
     return jsonify(data)  
 
 
