@@ -27,11 +27,13 @@ from selenium.webdriver.remote.webelement import WebElement
 import openpyxl
 import pandas as pd
 from selenium.common.exceptions import StaleElementReferenceException, NoSuchWindowException
-
+import redis
+from dotenv import dotenv_values
+import json
 
 def initilize_driver():
         # options = Options()
-        # # options.add_experimental_option('debuggerAddress', '127.0.0.1:9222')
+        # options.add_experimental_option('debuggerAddress', '127.0.0.1:9222')
         # options.add_argument('start-maximized')
         # driver = webdriver.Chrome(options=options)
         # action = ActionChains(driver)
@@ -64,6 +66,17 @@ def initilize_driver():
 def validate(ele):
     text=ele.text if ele is not None else ""
     return text
+    
+
+def saveIntoRedis(data):
+    config=dotenv_values(".env")
+    host=config.get("REDIS_HOST")
+    port=config.get("REDIS_PORT")
+    r = redis.StrictRedis(host=host, port=port,decode_responses=True)
+    # Set the JSON data in Redis with a specific key
+    redis_key = 'leagues'  # Replace 'user:1' with your desired key
+    data=json.dumps(data)
+    r.set(redis_key, data)
     
 
 def Scrape(driver,action):
@@ -156,12 +169,18 @@ def Scrape(driver,action):
             }
     
         live_leagues.append(match)
-    return live_leagues,driver,action
+        
+    saveIntoRedis(live_leagues)
+    return driver,action
         
         
-# while True:
-#   Scrape()
-#   time.sleep(1)
+driver,action=initilize_driver()
+while True:
+  r_driver,r_action=Scrape(driver,action)
+  driver=r_driver
+  action=r_action
+  time.sleep(5)
+  print("data saved in redis at {}".format(datetime.now().time()))
 
 
 
