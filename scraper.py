@@ -110,8 +110,17 @@ def Scrape(driver,action):
         time=validate(time).replace("\xa0","")
         team1_score=match.find("div",class_="event__score event__score--home")
         team1_score=validate(team1_score)
+        
+        if team1_score=="":
+              team1_score=match.find("div",class_="event__score event__score--home highlighted")
+              team1_score=validate(team1_score)
+              
         team2_score=match.find("div",class_="event__score event__score--away")
         team2_score=validate(team2_score)
+        
+        if team2_score=="":
+            team2_score=match.find("div",class_="event__score event__score--away highlighted")
+            team2_score=validate(team2_score)
         
         team1_logo=match.select_one(".event__logo.event__logo--home")["src"]
         team2_logo=match.select_one(".event__logo.event__logo--away")["src"]
