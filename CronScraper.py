@@ -65,6 +65,8 @@ def initilize_driver():
 
 def validate(ele):
     text=ele.text if ele is not None else ""
+    if "GOAL" in text:
+        text=text.replace("GOAL","")
     return text
     
 
